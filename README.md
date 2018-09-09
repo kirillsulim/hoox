@@ -1,0 +1,2 @@
+# hoox
+Git hooks manager
