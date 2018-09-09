@@ -102,3 +102,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Py Charm
+.idea
+*iml
+
+# VS Code
+.vscode

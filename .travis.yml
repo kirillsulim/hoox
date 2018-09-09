@@ -1,0 +1,22 @@
+language: python
+sudo: required
+services:
+  - docker
+python:
+  - "3.6"
+install:
+  - python setup.py install
+  - docker build -t $DOCKER_REPOSITORY . && docker tag $DOCKER_REPOSITORY $DOCKER_REPOSITORY:$(cat hoox.version)
+script:
+  - python setup.py check
+deploy:
+  - provider: pypi
+    user: kirillsulim
+    password: TBD
+    on:
+      branch: master
+    distributions: sdist bdist_wheel
+  - provider: script
+    script: bash ./scripts/deploy/docker-push.sh
+    on:
+      branch: master
