@@ -4,8 +4,8 @@ import os
 from subprocess import call
 from pkg_resources import resource_string
 
-
-DEFAULT_FOLDER = './hoox'
+HOOX_DIR = 'hoox'
+DEFAULT_FOLDER = os.path.join('..', '..', HOOX_DIR)
 
 
 def main():
@@ -31,19 +31,19 @@ def get_current_module():
 def init(args):
     if not os.path.exists(DEFAULT_FOLDER):
         os.makedirs(DEFAULT_FOLDER)
-    call(['git', 'config', '--local', 'core.hooksPath', os.path.join('..', '..', DEFAULT_FOLDER)])
+    call(['git', 'config', '--local', 'core.hooksPath', DEFAULT_FOLDER])
 
 
 def enable(args):
     hook = 'pre-commit'
     data = resource_string('hoox.resources', 'hook-runner.sh').decode('utf8')
     data = data.replace('{{hook-name}}', hook)
-    with open(os.path.join(DEFAULT_FOLDER, hook), 'wb') as file:
+    with open(os.path.join(HOOX_DIR, hook), 'wb') as file:
         file.write(data.encode('utf8'))
 
 
 def run_hook(args):
-    print('run-hook called')
+    print('run-hook called with:', *args)
     exit(0)
 
 
