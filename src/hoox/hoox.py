@@ -1,11 +1,13 @@
 import argparse
 import sys
 import os
-from subprocess import call
+import os.path as path
+from subprocess import call, run, PIPE
 from pkg_resources import resource_string
+from typing import List
 
-HOOX_DIR = 'hoox'
-DEFAULT_FOLDER = os.path.join('..', '..', HOOX_DIR)
+DEFAULT_HOOX_DIRECTORY = 'hoox'
+NOT_A_GIT_REPO_ERROR_MESSAGE = 'Current directory is not a git repository'
 
 
 def main():
@@ -19,6 +21,7 @@ def main():
     func = getattr(get_current_module(), func_name, None)
     if not callable(func):
         print('Unknown command {}'.format(main_args.command))
+        print(main_parser.format_help())
         exit(1)
     exit(func(main_args.options))
 
@@ -28,23 +31,89 @@ def get_current_module():
     return sys.modules[module_name]
 
 
-def init(args):
-    if not os.path.exists(DEFAULT_FOLDER):
-        os.makedirs(DEFAULT_FOLDER)
-    call(['git', 'config', '--local', 'core.hooksPath', DEFAULT_FOLDER])
+def init(args: List[str]) -> int:
+    if not check_in_git_repo():
+        print(NOT_A_GIT_REPO_ERROR_MESSAGE)
+        return 1
+
+    init_parser = argparse.ArgumentParser(description='')
+    init_parser.add_argument('-d', '--directory', nargs='?', help='hoox directory')
+
+    args = init_parser.parse_args(args)
+    directory = args.directory if args.directory else DEFAULT_HOOX_DIRECTORY
+
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    if not path.isabs(directory):
+        # Patch directory because hookPath must be relative to .git/hooks directory
+        directory = path.join('..', '..', directory)
+
+    return call(['git', 'config', '--local', 'core.hooksPath', directory])
 
 
-def enable(args):
-    hook = 'pre-commit'
+def enable(args: List[str]) -> int:
+    if not check_in_git_repo():
+        print(NOT_A_GIT_REPO_ERROR_MESSAGE)
+        return 1
+
+    enable_parser = argparse.ArgumentParser(description='')
+    enable_parser.add_argument('hook', nargs=1, help='hook name')
+
+    args = enable_parser.parse_args(args)
+    hook = args.hook[0]
+    if not check_hook_is_supported(hook):
+        print('Hook {} is not supported'.format(hook))
+        return 1
+
     data = resource_string('hoox.resources', 'hook-runner.sh').decode('utf8')
     data = data.replace('{{hook-name}}', hook)
-    with open(os.path.join(HOOX_DIR, hook), 'wb') as file:
+    with open(path.join(get_hoox_dir(), hook), 'wb') as file:
         file.write(data.encode('utf8'))
 
+    return 0
 
-def run_hook(args):
+
+def disable(args: List[str]) -> int:
+    if not check_in_git_repo():
+        print(NOT_A_GIT_REPO_ERROR_MESSAGE)
+        return 1
+
+    disable_parser = argparse.ArgumentParser(description='')
+    disable_parser.add_argument('hook', nargs=1, help='hook name')
+
+    args = disable_parser.parse_args(args)
+    hook = args.hook[0]
+    if not check_hook_is_supported(hook):
+        print('Hook {} is not supported'.format(hook))
+        return 1
+
+    os.remove(path.join(get_hoox_dir(), hook))
+    return 0
+
+
+def get_hoox_dir() -> str:
+    result = run(['git', 'config', '--get', 'core.hooksPath'], stdout=PIPE)
+    directory = result.stdout.decode('utf8').strip('\n\r\t ')
+    if not path.isabs(directory):
+        # Unpatch directory from git config
+        directory = path.dirname(path.dirname(directory))
+    return directory
+
+
+def check_hook_is_supported(hook: str) -> bool:
+    return hook in [
+        'pre-commit',
+    ]
+
+
+def check_in_git_repo() -> bool:
+    return path.isdir('.git')
+
+
+def run_hook(args: List[str]) -> int:
     print('run-hook called with:', *args)
-    exit(0)
+    return 0
 
 
 if __name__ == '__main__':
