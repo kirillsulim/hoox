@@ -2,11 +2,12 @@ import argparse
 import sys
 import os
 import os.path as path
+import stat
 from subprocess import call, run, PIPE
 from pkg_resources import resource_string
 from typing import List
 
-DEFAULT_HOOX_DIRECTORY = 'hoox'
+DEFAULT_HOOX_DIRECTORY = path.join('.', 'hoox')
 NOT_A_GIT_REPO_ERROR_MESSAGE = 'Current directory is not a git repository'
 
 
@@ -45,10 +46,6 @@ def init(args: List[str]) -> int:
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-    if not path.isabs(directory):
-        # Patch directory because hookPath must be relative to .git/hooks directory
-        directory = path.join('..', '..', directory)
-
     return call(['git', 'config', '--local', 'core.hooksPath', directory])
 
 
@@ -68,8 +65,10 @@ def enable(args: List[str]) -> int:
 
     data = resource_string('hoox.resources', 'hook-runner.sh').decode('utf8')
     data = data.replace('{{hook-name}}', hook)
-    with open(path.join(get_hoox_dir(), hook), 'wb') as file:
+    hook_sh = path.join(get_hoox_dir(), hook)
+    with open(hook_sh, 'wb') as file:
         file.write(data.encode('utf8'))
+    os.chmod(hook_sh, os.stat(hook_sh).st_mode | stat.S_IEXEC)
 
     return 0
 
@@ -88,16 +87,18 @@ def disable(args: List[str]) -> int:
         print('Hook {} is not supported'.format(hook))
         return 1
 
-    os.remove(path.join(get_hoox_dir(), hook))
+    hook_sh = path.join(get_hoox_dir(), hook)
+    if path.exists(hook_sh):
+        os.remove(hook_sh)
+        print('Hook {} disabled'.format(hook))
+    else:
+        print('Hook {} is not enabled'.format(hook))
     return 0
 
 
 def get_hoox_dir() -> str:
     result = run(['git', 'config', '--get', 'core.hooksPath'], stdout=PIPE)
     directory = result.stdout.decode('utf8').strip('\n\r\t ')
-    if not path.isabs(directory):
-        # Unpatch directory from git config
-        directory = path.dirname(path.dirname(directory))
     return directory
 
 
@@ -113,7 +114,8 @@ def check_in_git_repo() -> bool:
 
 def run_hook(args: List[str]) -> int:
     print('run-hook called with:', *args)
-    return 0
+    print(os.getcwd())
+    return 1
 
 
 if __name__ == '__main__':
