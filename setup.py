@@ -4,7 +4,10 @@ from os import path
 
 project_directory = path.abspath(path.dirname(__file__))
 
+data_files = []
+
 def load_from(file_name):
+    data_files.append(file_name)
     with open(path.join(project_directory, file_name), encoding='utf-8') as f:
         return f.read()
 
@@ -21,6 +24,9 @@ setup(
     package_dir={'': 'src'},
     package_data={'': '*'},
     include_package_data=True,
+    data_files=[
+        ('.', data_files),
+    ],
     entry_points={
         'console_scripts': [
             'hoox = hoox.hoox:main',
