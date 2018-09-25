@@ -47,9 +47,11 @@ def init(args: List[str]) -> int:
 
     if not os.path.exists(directory):
         os.makedirs(directory)
-    data = resource_string('hoox.resources', 'hoox.py').decode('utf8')
-    with open(path.join(directory, HOOX_FILE), 'wb') as file:
-        file.write(data.encode('utf8'))
+    hoox_file = path.exists(path.join(directory, HOOX_FILE))
+    if not path.exists(hoox_file):
+        data = resource_string('hoox.resources', 'hoox.py').decode('utf8')
+        with open(hoox_file, 'wb') as file:
+            file.write(data.encode('utf8'))
 
     return call(['git', 'config', '--local', 'core.hooksPath', directory])
 
