@@ -14,9 +14,9 @@ Optional arguments:
 
 - `--directory` or `--d` - directory to store hook scripts. Default is `.hoox` in project root.
 
-You can use separate directory or eve repository to store typical hooks for specific language.
+You can use separate directory to store typical hooks for specific language.
 
-## List pf supported hooks
+## List of supported hooks
 
 Hoox support folowing hooks in current version:
 
@@ -41,7 +41,7 @@ By default all hooks are disabled. To enable hook run
 hoox enable <hook-name>
 ```
 
-Enabling hooks realized via adding .sh script that runs `hoox run-hook <hook-name> [hook-arguments]`.
+Enable hooks realized via adding .sh script that runs `hoox run-hook <hook-name> [hook-arguments]`.
 
 ## Disabling hookx
 
@@ -51,5 +51,5 @@ To disable hook run
 hoox disable <hook-name>
 ```
 
-Disabling hooks realized via deleting .sh script from previous paragraph.
+Disable hooks realized via deleting .sh script from previous paragraph.
 Do not edit those scripts, cause you can lost all changes when hook is disabled.
