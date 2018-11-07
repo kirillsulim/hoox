@@ -110,6 +110,19 @@ def run_hook(args: List[str]) -> int:
     return exit_code
 
 
+def info(args: List[str]) -> int:
+    hoox_dir = _get_hoox_dir()
+    enabled_hooks = [f for f in os.listdir(hoox_dir) if path.isfile(path.join(hoox_dir, f)) and _check_hook_is_supported(f)]
+    print('Hoox dir:', hoox_dir)
+    if enabled_hooks:
+        print('Enabled hooks:')
+        for hook in enabled_hooks:
+            print('  ' + hook)
+    else:
+        print('No enabled hooks')
+    return 0
+
+
 def _get_current_module():
     module_name = globals()['__name__']
     return sys.modules[module_name]
