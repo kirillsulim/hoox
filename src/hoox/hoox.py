@@ -15,6 +15,10 @@ NOT_A_GIT_REPO_ERROR_MESSAGE = 'Current directory is not a git repository'
 
 
 def main():
+    if not _check_in_git_repo():
+        print(NOT_A_GIT_REPO_ERROR_MESSAGE)
+        exit(1)
+
     main_parser = argparse.ArgumentParser(description='')
     main_parser.add_argument('command', nargs=1, choices=_get_available_commands())
     main_parser.add_argument('options', nargs=argparse.REMAINDER)
@@ -31,10 +35,6 @@ def main():
 
 
 def init(args: List[str]) -> int:
-    if not _check_in_git_repo():
-        print(NOT_A_GIT_REPO_ERROR_MESSAGE)
-        return 1
-
     init_parser = argparse.ArgumentParser(description='')
     init_parser.add_argument('-d', '--directory', nargs='?', help='hoox directory')
 
@@ -53,10 +53,6 @@ def init(args: List[str]) -> int:
 
 
 def enable(args: List[str]) -> int:
-    if not _check_in_git_repo():
-        print(NOT_A_GIT_REPO_ERROR_MESSAGE)
-        return 1
-
     enable_parser = argparse.ArgumentParser(description='')
     enable_parser.add_argument('hook', nargs=1, help='hook name')
 
@@ -77,10 +73,6 @@ def enable(args: List[str]) -> int:
 
 
 def disable(args: List[str]) -> int:
-    if not _check_in_git_repo():
-        print(NOT_A_GIT_REPO_ERROR_MESSAGE)
-        return 1
-
     disable_parser = argparse.ArgumentParser(description='')
     disable_parser.add_argument('hook', nargs=1, help='hook name')
 
@@ -100,10 +92,6 @@ def disable(args: List[str]) -> int:
 
 
 def run_hook(args: List[str]) -> int:
-    if not _check_in_git_repo():
-        print(NOT_A_GIT_REPO_ERROR_MESSAGE)
-        return 1
-
     run_hook_parser = argparse.ArgumentParser(description='')
     run_hook_parser.add_argument('hook_name', metavar='hook-name', nargs=1, help='hook name')
     run_hook_parser.add_argument('args', nargs=argparse.REMAINDER)
