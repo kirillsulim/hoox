@@ -6,7 +6,7 @@ Hoox is git hooks manager
 
 For initialization you shuld run init command in project root
 
-```sh
+```plaintext
 hoox init
 ```
 
@@ -15,6 +15,25 @@ Optional arguments:
 - `--directory` or `--d` - directory to store hook scripts. Default is `.hoox` in project root.
 
 You can use separate directory to store typical hooks for specific language.
+
+In case of already initialized repository you will be prompted to rewrite hoox directory.
+
+## Show information
+
+To show current hoox status, hoox directory and enabled hooks, you can run following command
+
+```plaintext
+hoox info
+```
+
+Command will show info:
+
+```plaintext
+Hoox dir: ./hoox
+Enabled hooks:
+  pre-commit
+  pre-push
+```
 
 ## List of supported hooks
 
@@ -29,7 +48,7 @@ Hoox support folowing hooks in current version:
 
 You can run hook for test purpose via
 
-```sh
+```plaintext
 hoox run-hook <hook-name> [hook-arguments ...]
 ```
 
@@ -37,7 +56,7 @@ hoox run-hook <hook-name> [hook-arguments ...]
 
 By default all hooks are disabled. To enable hook run
 
-```sh
+```plaintext
 hoox enable <hook-name>
 ```
 
@@ -47,7 +66,7 @@ Enable hooks realized via adding .sh script that runs `hoox run-hook <hook-name>
 
 To disable hook run
 
-```sh
+```plaintext
 hoox disable <hook-name>
 ```
 
