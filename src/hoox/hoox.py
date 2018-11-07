@@ -143,7 +143,7 @@ def _get_current_module():
 def _get_available_commands() -> List[str]:
     module = _get_current_module()
     return [
-        name for name, member in getmembers(module) \
+        _get_command_name(name) for name, member in getmembers(module) \
         if getmodule(member) == module \
             and isfunction(member) \
             and not name.startswith('_') \
@@ -172,6 +172,10 @@ def _check_in_git_repo() -> bool:
 
 def _get_function_name(name: str) -> str:
     return name.replace('-', '_')
+
+
+def _get_command_name(name: str) -> str:
+    return name.replace('_', '-')
 
 
 if __name__ == '__main__':
