@@ -112,8 +112,13 @@ def run_hook(args: List[str]) -> int:
 
 def info(args: List[str]) -> int:
     hoox_dir = _get_hoox_dir()
+    if hoox_dir:
+        print('Hoox dir:', hoox_dir)
+    else:
+        print('Hoox is not initialized for this repository')
+        return 0
+
     enabled_hooks = [f for f in os.listdir(hoox_dir) if path.isfile(path.join(hoox_dir, f)) and _check_hook_is_supported(f)]
-    print('Hoox dir:', hoox_dir)
     if enabled_hooks:
         print('Enabled hooks:')
         for hook in enabled_hooks:
