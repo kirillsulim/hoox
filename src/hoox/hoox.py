@@ -41,6 +41,13 @@ def init(args: List[str]) -> int:
     args = init_parser.parse_args(args)
     directory = args.directory if args.directory else DEFAULT_HOOX_DIRECTORY
 
+    hoox_dir = _get_hoox_dir()
+    if hoox_dir:
+        res = input('Do you want to reinit and replace from {} to {} directory? [y/N] '.format(hoox_dir, directory)).lower()
+        if res != 'y' and res != 'yes':
+            print('Aborting init')
+            return 0
+
     if not os.path.exists(directory):
         os.makedirs(directory)
     hoox_file = path.exists(path.join(directory, HOOX_FILE))
