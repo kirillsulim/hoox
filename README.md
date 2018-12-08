@@ -14,7 +14,7 @@ Optional arguments:
 
 - `--directory` or `--d` - directory to store hook scripts. Default is `.hoox` in project root.
 
-You can use separate directory to store typical hooks for specific language.
+You can use separate directory to store typical hooks for specific programming language.
 
 In case of already initialized repository you will be prompted to rewrite hoox directory.
 
@@ -62,7 +62,7 @@ hoox enable <hook-name>
 
 Enable hooks realized via adding .sh script that runs `hoox run-hook <hook-name> [hook-arguments]`.
 
-## Disabling hookx
+## Disabling hooks
 
 To disable hook run
 
